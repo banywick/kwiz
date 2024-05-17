@@ -1,8 +1,10 @@
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect, render
 
-from .forms import LoginForm
+from main.models import CustomUser
 
+from .forms import LoginForm, RegisterForm
+user = CustomUser()
 def login_view(request):
     print(request.POST)
     if request.method == 'POST':
@@ -16,9 +18,13 @@ def login_view(request):
                 return redirect('main')
             else:
                  return render(request, 'login.html', {'login_form': login_form, 'error': 'Неверный логин или пароль'} )
-        
     login_form = LoginForm()       
-    return render(request, 'login.html', {'login_form': login_form} )
+    return render(request, 'login.html', {'login_form': login_form})
+
+def register_view(request):
+     register_form = RegisterForm()
+     return render(request, 'register.html', {'register_form': register_form})
+
 
 
 
