@@ -1,6 +1,7 @@
 from django import forms
 from main.utils.validators import validate_password
-from main.utils.choices import klass_Choices
+from .models import klass_Choices
+
 
 
 
