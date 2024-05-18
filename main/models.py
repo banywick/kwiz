@@ -6,8 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 
-class CustomUser(AbstractUser):
-    class_scool = models.CharField(max_length=10)
+
 
 
 EventType_Choices = (
@@ -65,6 +64,11 @@ Status_Choices = (
     ("Посещено", "Посещено")
 )
 
+
+class CustomUser(AbstractUser):
+    class_scool = models.CharField(max_length=10, choices=klass_Choices)
+    
+
 class EventType(models.Model):
     name = models.CharField(max_length=100,
                             verbose_name='Наименование типа мероприятия',
@@ -83,120 +87,67 @@ class EducationLevel(models.Model):
         return self.name
 
 
-class Profile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    patronymic = models.CharField(max_length=255, verbose_name='Отчество (если есть)', blank=True, null=True)
-    klass = models.CharField(max_length=4, verbose_name='Класс обучающегося', choices=klass_Choices, blank=True)
-
-    def __str__(self):
-        return str(self.user)
-
-class Team(models.Model):
-    name = models.CharField(max_length=255)
-    date_created = models.DateTimeField(blank=True, null=True)
-    date_disbanded = models.DateTimeField(blank=True, null=True)
-
-    def __str__(self):
-        return str(self.name)
-
 class Event(models.Model):
-    name = models.CharField(max_length=255)
-    max_eventers = models.IntegerField(default=100)
-    image = models.ImageField(upload_to='images', null=True, blank=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
-    #вид мероприятия еще был, но пока без него, забыл что он должен закрывать
-    EventType = models.ForeignKey('EventType', on_delete=models.CASCADE)
-    EducationLevel = models.ForeignKey('EducationLevel', on_delete=models.CASCADE)
+    max_eventers = models.IntegerField(default=100)
+    location = models.CharField(max_length=255, null=True, blank=True)
+    date_event = models.DateField(null=True, blank=True)
+    event_type = models.ForeignKey('EventType', on_delete=models.CASCADE)
+    education_level = models.ForeignKey('EducationLevel', on_delete=models.CASCADE)
+    responsible = models.ForeignKey('CustomUser', null=True, blank=True, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images', null=True, blank=True)
 
     def __str__(self):
-        return str(self.name)
+        return str(self.title)
+    
+    def get_absolute_url(self):
+        return reverse("detail_event", kwargs={"pk": self.pk})
 
 
-class Event_Plan(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
-    Date_Start = models.DateField(null=True, blank=True)
-    Date_End = models.DateField(null=True, blank=True)
-    Responsible = models.ForeignKey(Profile, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return str(self.name)
-
-
-class Event_Plan_Position(models.Model):
-    Event_Plan = models.ForeignKey('Event_Plan', on_delete=models.PROTECT)
-    Event = models.ForeignKey('Event', on_delete=models.PROTECT)
-    Date = models.DateField(null=True, blank=True)
-    Date_Plan = models.DateField(null=True, blank=True)
-    Date_Fact = models.DateField(null=True, blank=True)
-    Description = models.TextField(null=True, blank=True)
-    Eventers_Plan = models.IntegerField(null=True, blank=True)
-    Eventers_Fact = models.IntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return str(self.Event)
-
-class Invitation(models.Model):
+class Application(models.Model):
     date_submitted = models.DateField(blank=True, null=True)
-    Event_Plan_Position = models.ForeignKey('Event_Plan_Position', on_delete=models.CASCADE)
-    Team = models.ForeignKey('Team', on_delete=models.CASCADE, null=True, blank=True)
-    Team_Members = models.ForeignKey('Team_Members', on_delete=models.CASCADE, null=True, blank=True)
-    Profile = models.ForeignKey('Profile', on_delete=models.CASCADE, null=True, blank=True)
+    event = models.ForeignKey('Event', blank=True, null=True, on_delete=models.CASCADE)
+    user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, null=True, blank=True)
+    status = models.ForeignKey('Status', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        if self.Profile:
-            return str(self.Profile)
-        else:return str(self.Team)
-
-class Team_List(models.Model):
-    Team = models.ForeignKey('Team', on_delete=models.CASCADE)
-
-
-class Team_Members(models.Model):
-    Team_List = models.ForeignKey('Team_List', on_delete=models.CASCADE)
-    Profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
+        return f"{self.user}, {self.date_submitted}"
 
 
 class Results(models.Model):
-    Team_List = models.ForeignKey('Team_List', on_delete=models.CASCADE)
-    Invitation = models.ForeignKey('Invitation', on_delete=models.CASCADE)
-    Result = models.TextField(null=True, blank=True)
+    event = models.ForeignKey('Event', null=True, blank=True, on_delete=models.CASCADE)
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.Result)
+        return str(self.description)
 
 
 class Post(models.Model):
-    name = models.CharField(max_length=255, null=True, blank=True)
+    title = models.CharField(max_length=255, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='images', null=True, blank=True)
-    Profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
+    user = models.ForeignKey('CustomUser', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.name + ' | ' + str(self.Profile)
+        return f"{self.title} | {self.user}"
 
     def get_absolute_url(self):
-        return reverse('post_detail', args=(str(self.id)))
+        return reverse('post_detail', args=(str(self.pk)))
+
 
 class Feedback(models.Model):
-    Feedback = models.TextField(null=True, blank=True)
-    Time_Submit = models.DateTimeField(null=True, blank=True)
-    Profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
-    Event_Plan_Position = models.ForeignKey('Event_Plan_Position', on_delete=models.CASCADE)
-    Post = models.ForeignKey('Post', on_delete=models.CASCADE)
-
+    feedback = models.TextField(null=True, blank=True)
+    time_submit = models.DateTimeField(null=True, blank=True)
+    user = models.ForeignKey('CustomUser', blank=True, null=True, on_delete=models.CASCADE)
+    event = models.ForeignKey('Event', blank=True, null=True, on_delete=models.CASCADE)
+    post = models.ForeignKey('Post', blank=True, null=True, on_delete=models.CASCADE)
+    
     def __str__(self):
-        return str(self.Feedback)
+        return str(self.feedback)
 
 class Status(models.Model):
-    name = models.CharField(max_length=255, verbose_name='Статус заявки', choices=Status_Choices, blank=True, default='На рассмотрении')
+    title = models.CharField(max_length=255, verbose_name='Статус заявки', choices=Status_Choices, blank=True)
 
     def __str__(self):
-        return str(self.name)
-
-class InvitationStatus(models.Model):
-    Invitation = models.ForeignKey('Invitation', on_delete=models.CASCADE)
-    Status = models.ForeignKey('Status', on_delete=models.CASCADE)
-    Profile = models.ForeignKey('Profile', on_delete=models.CASCADE)
-    Status_Date = models.DateField(blank=True, null=True, auto_now_add=True)
-    Description = models.CharField(max_length=255, blank=True, null=True)
-
+        return str(self.title)
