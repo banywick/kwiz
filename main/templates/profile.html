@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>profile</title>
+</head>
+<body>
+  
+<title>Контактные данные</title>
+<div class="page_user_data">
+    <div class="user_data">
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="success-message">{{ message }}</div>
+        <script>
+            setTimeout(function() {
+                let successMessage = document.querySelector('.success-message');
+                successMessage.style.display = 'none';
+            }, 5000);
+        </script>
+        {% endif %}
+        {% endfor %}
+        <p class="title">Контактные данные пользователя</p>
+        <form method="POST" class="user_data_form" action="" novalidate>
+            {% csrf_token %}
+            {{edit_contact_data_form.as_p}}
+            </div>
+            <button class="change_button" name="edit_contact_data">Изменить</button>
+        </form>
+        <p class="title">Изменить пароль пользователя</p>
+        {% for message in messages %}
+        {% if message.tags == 'success' %}
+        <div class="success-message">{{ message }}</div>
+        <script>
+            setTimeout(function() {
+                let successMessage = document.querySelector('.success-message');
+                successMessage.style.display = 'none';
+            }, 5000);
+        </script>
+        {% endif %}
+        {% endfor %}
+        <form method="POST" class="user_data_form" action="" novalidate>
+            {% csrf_token %}
+            {{change_pass_form.as_p}}
+            </div>
+            <button class="change_button" name="change_password">Сохранить</button>
+        </form>
+    </div>
+</div>
+    
+</body>
+</html>

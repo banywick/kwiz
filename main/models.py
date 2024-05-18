@@ -1,6 +1,4 @@
-# from django.contrib.auth.models import AbstractUser
-
-
+from django.contrib.auth.models import AbstractUser
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -8,8 +6,8 @@ from django.urls import reverse
 from django.utils import timezone
 
 
-# class CustomUser(AbstractUser):
-#     class_scool = models.CharField(max_length=10)
+class CustomUser(AbstractUser):
+    class_scool = models.CharField(max_length=10)
 
 
 EventType_Choices = (
@@ -86,7 +84,7 @@ class EducationLevel(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     patronymic = models.CharField(max_length=255, verbose_name='Отчество (если есть)', blank=True, null=True)
     klass = models.CharField(max_length=4, verbose_name='Класс обучающегося', choices=klass_Choices, blank=True)
 
