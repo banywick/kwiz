@@ -9,6 +9,9 @@
 {% block stylesheet %}{% endblock %}
 
 {% block content %}
+<div class="user_event">
+    <a href="{% url 'profile_event'%}">Мои мероприятия --➡️</a>
+</div>
 <div class="card">
     {% for message in messages %}
     {% if message.tags == 'success' %}

@@ -33,7 +33,7 @@ class RegisterForm(forms.Form):
         label='Класс:')
 
     password = forms.CharField(error_messages={'required': 'Введите пароль'},
-                              widget=forms.PasswordInput(
+                            widget=forms.PasswordInput(
         attrs={'class': 'form-control', 'placeholder': 'Введите пароль'}),
         validators=[validate_password], label='Пароль:')
 
@@ -50,12 +50,12 @@ class RegisterForm(forms.Form):
 
 class EditContactDataForm(forms.ModelForm):
     username = forms.CharField(error_messages={'required': 'Не указанно имя'},
-                          max_length=50, widget=forms.TextInput(
+                        max_length=50, widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Ваше имя'}),
         label='Имя:')
 
     last_name = forms.CharField(error_messages={'required': 'Не указанно отчество'},
-                              max_length=50, widget=forms.TextInput(
+                            max_length=50, widget=forms.TextInput(
         attrs={'class': 'form-control', 'placeholder': 'Ваше отчество'}),
         label='Отчество:')
 
@@ -75,15 +75,15 @@ class ChangePasswordForm(forms.ModelForm):
     password = forms.CharField(error_messages={'required': 'Введите старый пароль'},
         label='Введите старый пароль',
         widget=forms.PasswordInput(
-        attrs={'class': 'input_field', 'placeholder': 'Введите старый пароль'}))
+        attrs={'class': 'form-control', 'placeholder': 'Введите старый пароль'}))
     
     new_password = forms.CharField(error_messages={'required': 'Введите новый пароль'},
         widget=forms.PasswordInput(
-        attrs={'class': 'input_field', 'placeholder': 'Введите новый пароль'}),
+        attrs={'class': 'form-control', 'placeholder': 'Введите новый пароль'}),
         validators=[validate_password], label='Введите новый пароль')
     
     repeat_new_pass = forms.CharField(error_messages={'required': 'Повторите новый пароль'}, widget=forms.PasswordInput(
-        attrs={'class': 'input_field', 'placeholder': 'Повторите новый пароль'}), label='Повторите новый пароль')
+        attrs={'class': 'form-control', 'placeholder': 'Повторите новый пароль'}), label='Повторите новый пароль')
 
     def clean(self):
         cleaned_data = super().clean()

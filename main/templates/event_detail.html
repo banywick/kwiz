@@ -25,7 +25,12 @@
             {% if user_is_staff %}
             <button type="submit" class="btn btn-primary">Изменить</button>
             {% else %}
-            <button type="submit" class="btn btn-primary">Подать заявку</button>
+            {% if user.is_authenticated %}
+            <a class="btn btn-primary ms-auto" aria-current="page"  href="{% url 'subscribe' object.pk %}" class="nav-link">Подать заявку</a>
+            {% comment %} <button type="submit" class="btn btn-primary">Подать заявку</button> {% endcomment %}
+            {% else %}
+            <a class="btn btn-primary ms-auto" aria-current="page"  href="{% url 'login' %}" class="nav-link">Подать заявку</a>
+            {% endif %}
             {% endif %}
         </form>
     </div>

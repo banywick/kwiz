@@ -30,18 +30,24 @@
                         {% endif %}
                     </ul>
                 </div>
-                {% if user.is_active %}
+                {% comment %} {% if user.is_active %} {% endcomment %}
                 <div class="d-flex justify-content-center py-3">
                     <ul class="nav nav-pills">
                         <li class="nav-item ">
                             <span class="nav-link header-username">{{ user.username }}</span>
                         </li>
+                        {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a href="" class="nav-link">Выход</a>
+                            <a href="{% url 'logout' %}" class="nav-link">Выход</a>
                         </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a href="{% url 'login' %}" class="nav-link">Войти</a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </div>
-                {% endif %}
+                {% comment %} {% endif %} {% endcomment %}
             </div>
         </header>
         <main class="row justify-content-center">

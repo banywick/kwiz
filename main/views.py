@@ -1,13 +1,14 @@
 from datetime import datetime
 from typing import Any
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.generic.edit import FormView, FormMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from .models import *
+import datetime
 
 
 # from main.models import CustomUser
@@ -58,7 +59,7 @@ def user_profile(request):
     edit_contact_data_form = EditContactDataForm(instance=user)
     change_pass_form = ChangePasswordForm()
     context = {'edit_contact_data_form': edit_contact_data_form,
-              'change_pass_form': change_pass_form, }
+            'change_pass_form': change_pass_form, }
     if request.method == "POST":
         # Изменяем контактные данные пользователя
         if 'edit_contact_data' in request.POST:
@@ -70,7 +71,6 @@ def user_profile(request):
         # Изменяем пароль пользователя
         elif 'change_password' in request.POST:
             change_pass_form = ChangePasswordForm(request.POST, instance=user)
-            print(user.check_password(request.POST.get('password')), '****************')
             if change_pass_form.is_valid():
                 password = change_pass_form.cleaned_data.get("password")
                 new_password = change_pass_form.cleaned_data.get("new_password")
@@ -81,8 +81,33 @@ def user_profile(request):
                     messages.success(request, "Пароль пользователя успешно изменён!")
                     return redirect('profile')
         context = {'edit_contact_data_form': edit_contact_data_form,
-               'change_pass_form': change_pass_form, }  
+            'change_pass_form': change_pass_form, }  
     return render(request, 'profile.html', context=context)
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('main')
+
+
+def user_profile_event(request):
+    aplication = Application.objects.filter(user_id=request.user.id).select_related('event')
+    context = {'aplication': aplication}
+    return render(request, 'profile_list_event.html', context=context)
+
+
+def subscribe_view(request, pk):
+    now = datetime.datetime.now()
+    status = Status.objects.get(id=1)
+
+    if request.method == 'GET':
+        aplication, created = Application.objects.get_or_create(
+            user_id=request.user.id,
+            event_id=pk,
+            defaults={'date_submitted': now, 'status': status})
+        
+    return redirect(request.META.get('HTTP_REFERER'))
+
     
 
 class MainView(ListView):
@@ -121,6 +146,7 @@ class EventDetailView(DetailView):
     template_name = 'event_detail.html'
 
     def get_context_data(self, **kwargs):
+        # self.request.session['error_message'] = '' 
         context = super().get_context_data(**kwargs)
         context["form"] = CreateEventForm(context['event'].__dict__)
         context["feedback_form"] = FeedbackForm()

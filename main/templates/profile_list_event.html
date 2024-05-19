@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+<title>Контактные данные</title>
+{% endblock %}
+
+{% block stylesheet %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'profile' %}">Редактировать профиль</a>
+    </div>
+    <div class="card-header">
+        Список моих мероприятий
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for apl in aplication %}
+            <li class="row">
+                <div class="col">
+                    <img src="{{apl.event.image}}" alt="">
+                </div>
+                <div class="col-6">
+                    <div>{{ apl.event.name }}</div> 
+                    <div>{{ apl.event.description }}</div>
+                    <div>
+                        <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'detail_event' apl.event.id %}">Подробнее</a>
+                    </div>
+                </div>
+            </li>
+            <hr/>
+            {% empty %}
+            <li>Список мероприятий пуст.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
