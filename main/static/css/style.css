@@ -1,0 +1,20 @@
+.buttons_form {
+    display: flex;
+    justify-content: space-between;
+}
+
+.errorlist {
+    color: brown;
+}
+
+.header-username{
+    font-weight: 600;
+}
+
+label{
+    margin-bottom: 5px;
+}
+
+.create__form{
+    gap: 5px;
+}

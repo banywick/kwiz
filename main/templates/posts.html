@@ -3,21 +3,20 @@
 {% load static %}
 
 {% block title %}
-    <title>Главная</title>
+    <title>Публикации</title>
 {% endblock %}
 
 {% block stylesheet %}{% endblock %}
 
 {% block content %}
-
 {% if user_is_staff %}
     <div class="nav mb-2">
-        <a href="{% url 'create_event' %}" class="btn btn-success">Создать</a>
+        <a href="{% url 'create_post' %}" class="btn btn-success">Создать</a>
     </div>
 {% endif %}
 <div class="card">
     <div class="card-header">
-        Список мероприятий
+        Список публикаций
     </div>
     <div class="card-body">
         <ul class="list-group">
@@ -30,16 +29,15 @@
                     <div>{{ object.name }}</div> 
                     <div>{{ object.description }}</div>
                     <div>
-                        <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'detail_event' object.id %}">Подробнее</a>
+                        <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'detail_post' object.id %}">Подробнее</a>
                     </div>
                 </div>
             </li>
             <hr/>
             {% empty %}
-            <li>Список мероприятий пуст.</li>
+            <li>Список публикаций пуст.</li>
             {% endfor %}
         </ul>
     </div>
 </div>
 {% endblock %}
-    

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    <title>Создание публикации</title>
+{% endblock %}
+
+{% block stylesheet %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        Регистрация новой публикации
+    </div>
+    <div class="card-body">
+        <form action="" method="post" class="create__form d-flex flex-column w-full" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            <button type="submit" class="btn btn-primary">Создать</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

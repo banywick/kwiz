@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    <title>Публикации</title>
+{% endblock %}
+
+{% block stylesheet %}{% endblock %}
+
+{% block content %}
+{% if user_is_staff %}
+    <div class="nav mb-2 d-flex justify-content-between">
+        <a href="{% url 'create_event' %}" class="btn btn-success">Заявки</a>
+    </div>
+{% endif %}
+<div class="card">
+    <div class="card-header">
+        О мероприятии
+    </div>
+    <div class="card-body">
+        <form action="" method="post" class="create__form d-flex flex-column w-full" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ object }}
+            {% if user_is_staff %}
+            <button type="submit" class="btn btn-primary">Изменить</button>
+            {% else %}
+            <button type="submit" class="btn btn-primary">Подать заявку</button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-body">
+        <form action="{% url 'create_feedback' %}" method="post" class="create__form d-flex flex-column w-full" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" readonly name="user" id="id_usert" value="{{ user.id }}">
+            <input type="hidden" readonly name="event" id="id_event" value="{{ event.id }}">
+            {{ feedback_form }}
+            <button type="submit" class="btn btn-primary mt-2">Отправить</button>
+        </form>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header">
+        Отзывы
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for object in feedback_list %}
+            <li class="row">
+                <div class="col-6 d-flex justify-content-between">
+                    <div>{{ object.user }}</div>
+                    <div>{{ object.time_submit }}</div>
+                </div>
+                <div>{{ object.feedback }}</div>
+                <div>
+                    <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'detail_event' object.id %}">Подробнее</a>
+                </div>
+            </li>
+            <hr/>
+            {% empty %}
+            <li>Отзывов нет.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+

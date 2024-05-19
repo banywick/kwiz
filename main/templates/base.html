@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}{% endblock %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static "css/null.css" %}">
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+
+    {% block stylesheet %}{% endblock %}
+</head>
+<body>
+    <div class="wraper">
+        <header class="header">
+            <div class="container d-flex justify-content-between">
+                <div class="d-flex justify-content-center py-3">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <a href="{% url 'main' %}" class="nav-link active">Мероприятия</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{% url 'posts' %}" class="nav-link">Публикации</a>
+                        </li>
+                        {% if user.is_active %}
+                        <li class="nav-item">
+                            <a href="{% url 'profile' %}" class="nav-link">Личный кабинет</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                {% if user.is_active %}
+                <div class="d-flex justify-content-center py-3">
+                    <ul class="nav nav-pills">
+                        <li class="nav-item ">
+                            <span class="nav-link header-username">{{ user.username }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="nav-link">Выход</a>
+                        </li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </header>
+        <main class="row justify-content-center">
+            <div class="container mt-5 col-md-6">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

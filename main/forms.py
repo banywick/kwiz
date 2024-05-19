@@ -1,8 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from main.utils.validators import validate_password
-from .models import klass_Choices
-from .models import CustomUser
+from .models import Feedback, Post, klass_Choices, EventType_Choices, EducationLevel_Choices
+from .models import CustomUser, Event
 
 
 class LoginForm(forms.Form):
@@ -99,10 +99,75 @@ class ChangePasswordForm(forms.ModelForm):
             print('johan')
             return password
         else:
-            raise forms.ValidationError('Неверный пароль')     
+            raise forms.ValidationError('Неверный пароль')
+        
 
     class Meta:
         model = get_user_model()
         fields = ['password']
 
 
+class CreateEventForm(forms.ModelForm):
+
+    class Meta:
+        model = Event
+        fields = '__all__'
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "max_eventers": forms.NumberInput(attrs={"class": "form-control"}),
+            "image": forms.FileInput(attrs={"class": "form-control"}),
+            "description": forms.Textarea(attrs={"class": "form-control", "cols": 40, "rows": 5}),
+            "EventType": forms.Select(attrs={'class': 'form-control'}),
+            "EducationLevel": forms.Select(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            "name": "Наименование",
+            "max_eventers": "Максимальное количество участников", 
+            "image": "Изображение", 
+            "description": "Описание",
+            "EventType": "Тип мероприятия", 
+            "EducationLevel": "Степень обучающихся", 
+        }
+        
+
+class CreatePostForm(forms.ModelForm):
+
+    class Meta:
+        model = Post
+        fields = ['title', 'description', 'image']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={"class": "form-control", "rows": 5}),
+            'image': forms.FileInput(attrs={"class": "form-control"})
+        }
+        labels = {
+            'title': 'Название',
+            'description': 'Содержание',
+            'image': 'Изображение'
+        }
+
+
+class FeedbackForm(forms.ModelForm):
+    feedback = forms.CharField(
+        error_messages={'required': 'Пустой отзыв отправить нельзя!'},
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+        label='Оставить отзыв'
+    )
+
+    class Meta:
+        model = Feedback
+        fields = ['feedback']
+
+
+class FeedbackCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Feedback
+        fields = '__all__'
+
+
+class PostForm(forms.ModelForm):
+
+    class Meta:
+        model = Post
+        fields = ['title', 'description', 'image', 'time_submit']

@@ -67,7 +67,7 @@ Status_Choices = (
 
 class CustomUser(AbstractUser):
     class_scool = models.CharField(max_length=10, choices=klass_Choices)
-    
+
 
 class EventType(models.Model):
     name = models.CharField(max_length=100,
@@ -75,7 +75,7 @@ class EventType(models.Model):
                             choices=EventType_Choices)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
 
 
 class EducationLevel(models.Model):
@@ -84,7 +84,7 @@ class EducationLevel(models.Model):
                             choices=EducationLevel_Choices)
 
     def __str__(self):
-        return self.name
+        return f"{self.name}"
 
 
 class Event(models.Model):
@@ -92,18 +92,19 @@ class Event(models.Model):
     description = models.TextField(null=True, blank=True)
     max_eventers = models.IntegerField(default=100)
     location = models.CharField(max_length=255, null=True, blank=True)
-    date_event = models.DateField(null=True, blank=True)
+    date_event = models.DateTimeField(null=True, blank=True)
     event_type = models.ForeignKey('EventType', on_delete=models.CASCADE)
     education_level = models.ForeignKey('EducationLevel', on_delete=models.CASCADE)
     responsible = models.ForeignKey('CustomUser', null=True, blank=True, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='images', null=True, blank=True)
-
+    
     def __str__(self):
         return str(self.title)
     
     def get_absolute_url(self):
         return reverse("detail_event", kwargs={"pk": self.pk})
-
+    
+    
 
 class Application(models.Model):
     date_submitted = models.DateField(blank=True, null=True)
@@ -128,6 +129,7 @@ class Post(models.Model):
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to='images', null=True, blank=True)
     user = models.ForeignKey('CustomUser', blank=True, null=True, on_delete=models.CASCADE)
+    time_submit = models.DateTimeField(null=True, blank=True, default=timezone.now)
 
     def __str__(self):
         return f"{self.title} | {self.user}"
@@ -138,7 +140,7 @@ class Post(models.Model):
 
 class Feedback(models.Model):
     feedback = models.TextField(null=True, blank=True)
-    time_submit = models.DateTimeField(null=True, blank=True)
+    time_submit = models.DateTimeField(null=True, blank=True, default=timezone.now)
     user = models.ForeignKey('CustomUser', blank=True, null=True, on_delete=models.CASCADE)
     event = models.ForeignKey('Event', blank=True, null=True, on_delete=models.CASCADE)
     post = models.ForeignKey('Post', blank=True, null=True, on_delete=models.CASCADE)
