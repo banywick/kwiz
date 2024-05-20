@@ -3,11 +3,88 @@
 {% load static %}
 
 {% block title %}
-    <title>Публикации</title>
+    <title>{{ post.title }}</title>
 {% endblock %}
 
 {% block stylesheet %}{% endblock %}
 
 {% block content %}
-{{form}}
+{% if edit %}
+<a href="{% url 'detail_post' post.id %}" class="btn btn-primary mb-3">⬅️Назад</a>
+<div class="card">
+    <div class="card-body">
+        <form action="{% url 'edit_post' %}" method="post" class="d-flex flex-column">
+            {% csrf_token %}
+            <input type="hidden" readonly name="post" value="{{post.id}}">
+            {{form}}
+            <input type="submit" class="btn btn-success mt-2" value="Изменить">
+        </form>
+        <div class="actual_photo mt-3 mb-2">Актуальное фото</div>
+        <img src="/{{img}}" alt="photo">
+    </div>
+</div>
+{% else %}
+{% if user.is_staff %}
+    <div class="nav mb-2 d-flex justify-content-between">
+        <a href="{% url 'detail_post' post.id %}?mode=edit" class="btn btn-success">Изменить</a>
+        <form action="{% url 'delete_post' %}" method="post">
+            {% csrf_token %}
+            <input type="hidden" readonly name="post" value="{{ post.id }}">
+            <input type="submit" class="btn btn-danger" value="Удалить">
+        </form>
+    </div>
+{% endif %}
+<div class="card">
+    <div class="card-body">
+        <div class="">{{ post.title }}</div>
+        <div class="">
+            <img src="/{{ post.image }}" alt="photo">
+        </div>
+        <div class="">{{ post.description }}</div>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-body">
+        <form action="{% url 'create_feedback' %}" method="post" class="create__form d-flex flex-column w-full" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" readonly name="user" id="id_user" value="{{ user.id }}">
+            <input type="hidden" readonly name="post" id="id_post" value="{{ post.id }}">
+            {{ feedback_form }}
+            <button type="submit" class="btn btn-primary mt-2">Отправить</button>
+        </form>
+    </div>
+</div>
+<div class="card mt-3">
+    <div class="card-header">
+        Комментарии
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for object in feedback_list %}
+            <li class="row d-flex flex-column w-full">
+                <div class="col-12 mb-4">{{ object.feedback }}</div>
+                <div class="col-12 d-flex justify-content-between">
+                    <div class="col-9 d-flex flex-column">
+                        <p class="mb-2 text-end text-muted fs-6">{{ object.user }}</p>
+                        <span class="text-end text-muted fs-6">{{ object.time_submit }}</span>
+                    </div> 
+                    {% if user.is_staff %}
+                    <div class="col-2">
+                        <a class="btn btn-danger ms-auto" aria-current="page" href="{% url 'delete_feedback' object.id %}">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                            </svg>
+                        </a>
+                    </div>
+                    {% endif %} 
+                </div>
+            </li>
+            <hr/>
+            {% empty %}
+            <li>Комментариев нет.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

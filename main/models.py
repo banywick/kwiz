@@ -68,6 +68,9 @@ Status_Choices = (
 class CustomUser(AbstractUser):
     class_scool = models.CharField(max_length=10, choices=klass_Choices)
 
+    def __str__(self) -> str:
+        return f"{self.username} {self.last_name}, {self.class_scool}"
+
 
 class EventType(models.Model):
     name = models.CharField(max_length=100,
@@ -107,7 +110,7 @@ class Event(models.Model):
     
 
 class Application(models.Model):
-    date_submitted = models.DateField(blank=True, null=True)
+    date_submitted = models.DateField(blank=True, null=True, default=timezone.now)
     event = models.ForeignKey('Event', blank=True, null=True, on_delete=models.CASCADE)
     user = models.ForeignKey('CustomUser', on_delete=models.CASCADE, null=True, blank=True)
     status = models.ForeignKey('Status', on_delete=models.CASCADE, null=True, blank=True)

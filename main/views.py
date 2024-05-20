@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Any
 from django.contrib import messages
+from django.db.models.query import QuerySet
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -13,7 +14,7 @@ import datetime
 
 # from main.models import CustomUser
 
-from .forms import ChangePasswordForm, CreateEventForm, CreatePostForm, EditContactDataForm, FeedbackCreateForm, FeedbackForm, LoginForm, RegisterForm
+from .forms import ChangePasswordForm, CommentForm, CreateEventForm, CreatePostForm, EditContactDataForm, FeedbackCreateForm, FeedbackForm, LoginForm, RegisterForm
 # user = CustomUser()
 
 
@@ -60,6 +61,7 @@ def user_profile(request):
     change_pass_form = ChangePasswordForm()
     context = {'edit_contact_data_form': edit_contact_data_form,
             'change_pass_form': change_pass_form, }
+    context['active'] =  {'profile': 'active'}
     if request.method == "POST":
         # Изменяем контактные данные пользователя
         if 'edit_contact_data' in request.POST:
@@ -135,7 +137,7 @@ class MainView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
+        context['active'] =  {'event': 'active'}
         context['user_is_staff'] = self.request.user.is_staff
         return context
 
@@ -153,7 +155,7 @@ class CreateEventView(FormView):
         event = CreateEventForm(request.POST, request.FILES)
         if event.is_valid():
             event.save()
-            return redirect('create_event')
+            return redirect('/')
         return super().post(request, *args, **kwargs)
     
 
@@ -179,21 +181,18 @@ def edit_event(request, pk):
         form = CreateEventForm(request.POST, instance=one_rec)  # Обновляем форму с данными из POST-запроса
         if form.is_valid():  # Проверяем валидность формы
             form.save()  # Сохраняем обновленные данные в базе данных
-        return redirect(request.META.get('HTTP_REFERER'))    
-
-        
-
- 
+        return redirect(request.META.get('HTTP_REFERER'))
     mydict= {'form':form}
     return render(request,'edit_event.html',context=mydict)
 
 
-def delete_event(request,id=None):
+def delete_event(request):
     if request.method == 'POST':
-        one_rec = Feedback.objects.get(pk=id)
-        one_rec.delete()
+        one_rec = Event.objects.get(id=request.POST.get('event'))
+        if one_rec:
+            one_rec.delete()
         return redirect('/')
-    return render(request,'Delete.html')
+    return redirect(request.META.get('HTTP_REFERER'))
 
 
 class PostsListView(ListView):
@@ -203,6 +202,7 @@ class PostsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['active'] =  {'post': 'active'}
         context['user_is_staff'] = self.request.user.is_staff
         return context
 
@@ -220,7 +220,7 @@ class CreatePostView(FormView):
         event = CreatePostForm(request.POST, request.FILES)
         if event.is_valid():
             event.save()
-        
+            return redirect('posts')
         return super().post(request, *args, **kwargs)
 
 
@@ -231,7 +231,15 @@ class PostDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form"] = CreatePostForm(context['event'].__dict__)
+        context["feedback_list"] = Feedback.objects.select_related('post').filter(post_id=context['post'].id).order_by('-time_submit')
+        context["feedback_form"] = CommentForm()
+        
+        if self.request.GET.get('mode'):
+            if self.request.GET.get('mode') == 'edit':
+                context["edit"] = True
+                inc = Post.objects.get(id=self.kwargs.get('pk'))
+                context["form"] = CreatePostForm(instance=inc)
+                context["img"] = inc.image
         return context
     
 
@@ -246,9 +254,59 @@ def create_feedback(request):
     else:
         return redirect(request.META.get('HTTP_REFERER'))
     
-def delete_feedback(request,id=None):
+def delete_feedback(request):
     if request.method == 'POST':
-        one_rec = Feedback.objects.get(pk=id)
-        one_rec.delete()
+        one_rec = Feedback.objects.get(pk=request.POST.get('feedback'))
+        if one_rec:
+            one_rec.delete()
         return redirect(request.META.get('HTTP_REFERER'))
     return redirect(request.META.get('HTTP_REFERER'))
+
+def edit_post(request):
+    if request.method == 'POST':
+        one_rec=Post.objects.get(id=request.POST.get('post'))
+        form=CreatePostForm(request.POST or None, request.FILES or None, instance=one_rec)
+        if form.is_valid():
+            form.save()
+            return redirect(f"/post/{request.POST.get('post')}/")
+    return redirect(request.META.get('HTTP_REFERER'))
+    
+def delete_post(request):
+    if request.method == 'POST':
+        one_rec = Post.objects.get(pk=request.POST.get('post'))
+        if one_rec:
+            one_rec.delete()
+            return redirect('posts')
+        return redirect(request.META.get('HTTP_REFERER'))
+    return redirect(request.META.get('HTTP_REFERER'))
+    
+
+class ApplicationView(ListView):
+    model = Application
+    template_name = 'application.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.kwargs.get('slug') == 'apply':
+            context['apply'] = True
+        elif self.kwargs.get('slug') == 'visit_log':
+            context['visit_log'] = True
+        context['event'] = Event.objects.get(id=self.kwargs.get('pk'))
+        return context
+    
+    def get_queryset(self) -> QuerySet[Any]:
+        if self.kwargs.get('slug') == 'apply':
+            return Application.objects.filter(status=1)
+        elif self.kwargs.get('slug') == 'visit_log':
+            return Application.objects.filter(status__in=[2, 5])
+    
+
+def change_status_application(request):
+    if request.method == 'POST':
+        instance=Application.objects.get(id=request.POST.get('apply_id'))
+        status = Status.objects.get(id=request.POST.get('status_id'))
+        instance.status = status
+        instance.save()
+    
+    return redirect(request.META.get('HTTP_REFERER'))
+    

@@ -18,27 +18,27 @@ class LoginForm(forms.Form):
 class RegisterForm(forms.Form):
     name = forms.CharField(error_messages={'required': 'Не указанно имя'},
         max_length=50, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Ваше имя'}),
+        attrs={'class': 'form-control mb-2', 'placeholder': 'Ваше имя'}),
         label='Имя:')
 
     surname = forms.CharField(error_messages={'required': 'Не указанно отчество'},
         max_length=50, widget=forms.TextInput(
-        attrs={'class': 'form-control', 'placeholder': 'Ваше отчество'}),
+        attrs={'class': 'form-control mb-2', 'placeholder': 'Ваше отчество'}),
         label='Отчество:')
 
     scool_class = forms.ChoiceField(
         error_messages={'required': 'Не указан ваш класс'},
         choices=[*klass_Choices],
-        widget=forms.Select(attrs={'class': 'form-control'}),
+        widget=forms.Select(attrs={'class': 'form-control mb-2'}),
         label='Класс:')
 
     password = forms.CharField(error_messages={'required': 'Введите пароль'},
                             widget=forms.PasswordInput(
-        attrs={'class': 'form-control', 'placeholder': 'Введите пароль'}),
+        attrs={'class': 'form-control mb-2', 'placeholder': 'Введите пароль'}),
         validators=[validate_password], label='Пароль:')
 
     password2 = forms.CharField(widget=forms.PasswordInput(
-        attrs={'class': 'form-control', 'placeholder': 'Повторите пароль'}), label='Повтор пароля:')
+        attrs={'class': 'form-control mb-2', 'placeholder': 'Повторите пароль'}), label='Повтор пароля:')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -111,22 +111,26 @@ class CreateEventForm(forms.ModelForm):
 
     class Meta:
         model = Event
-        fields = '__all__'
+        fields = ['title', 'description', 'location', 'max_eventers', 'date_event', 'event_type', 'education_level', 'image']
         widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "title": forms.TextInput(attrs={"class": "form-control"}),
             "max_eventers": forms.NumberInput(attrs={"class": "form-control"}),
             "image": forms.FileInput(attrs={"class": "form-control"}),
+            "location": forms.TextInput(attrs={"class": "form-control"}),
+            "date_event": forms.DateTimeInput(attrs={"class": "form-control", "placeholder": "гггг-мм-дд чч:мм"}),
             "description": forms.Textarea(attrs={"class": "form-control", "cols": 40, "rows": 5}),
-            "EventType": forms.Select(attrs={'class': 'form-control'}),
-            "EducationLevel": forms.Select(attrs={'class': 'form-control'}),
+            "event_type": forms.Select(attrs={'class': 'form-control'}),
+            "education_level": forms.Select(attrs={'class': 'form-control'}),
         }
         labels = {
-            "name": "Наименование",
+            "title": "Наименование",
             "max_eventers": "Максимальное количество участников", 
             "image": "Изображение", 
             "description": "Описание",
-            "EventType": "Тип мероприятия", 
-            "EducationLevel": "Степень обучающихся", 
+            "event_type": "Тип мероприятия", 
+            "education_level": "Степень обучающихся",
+            "location": "Место проведения",
+            "date_event": "Дата проведения"
         }
         
 
@@ -171,3 +175,15 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'description', 'image', 'time_submit']
+
+
+class CommentForm(forms.ModelForm):
+    feedback = forms.CharField(
+        error_messages={'required': 'Пустой комментарий отправить нельзя!'},
+        widget=forms.Textarea(attrs={"class": "form-control", "rows": 2}),
+        label='Оставить комментарий'
+    )
+
+    class Meta:
+        model = Feedback
+        fields = ['feedback']

@@ -3,17 +3,27 @@
 {% load static %}
 
 {% block title %}
-    <title>Публикации</title>
+    <title>{{ object.title }}</title>
 {% endblock %}
 
 {% block stylesheet %}{% endblock %}
 
 {% block content %}
-{% if user_is_staff %}
-    <div class="nav mb-2 d-flex justify-content-between">
-        <a href="{% url 'create_event' %}" class="btn btn-success">Заявки</a>
+<div class="nav mb-2 d-flex justify-content-between">
+    {% if user.is_staff %}
+    <div class="btn-group">
+        <a href="{% url 'applications' object.id 'apply' %}" class="btn btn-success">Заявки</a>
+        <a href="{% url 'applications' object.id 'visit_log' %}" class="btn btn-warning">Журнал</a>
     </div>
-{% endif %}
+    <form action="{% url 'delete_event' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" readonly name="event" value="{{ event.id }}">
+        <input type="submit" class="btn btn-danger" value="Удалить">
+    </form>
+    {% else %}
+    <a href="{% url 'apply' %}" class="btn btn-primary">Подать заявку</a>
+    {% endif %}
+</div>
 <div class="card">
     <div class="card-header">
         О мероприятии
@@ -24,7 +34,6 @@
             {{ object }}
             {% if user_is_staff %}
             <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'edit_event' object.pk %}">Редактировать событие</a>
-
             {% else %}
             {% if user.is_authenticated %}
             <a class="btn btn-primary ms-auto" aria-current="page"  href="{% url 'subscribe' object.pk %}" class="nav-link">Подать заявку</a>
@@ -54,14 +63,26 @@
     <div class="card-body">
         <ul class="list-group">
             {% for object in feedback_list %}
-            <li class="row">
-                <div class="col-6 d-flex justify-content-between">
-                    <div>{{ object.user }}</div>
-                    <div>{{ object.time_submit }}</div>
-                </div>
-                <div>{{ object.feedback }}</div>
-                <div>
-                    <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'detail_event' object.id %}">Подробнее</a>
+            <li class="row d-flex flex-column w-full">
+                <div class="col-12 mb-4">{{ object.feedback }}</div>
+                <div class="col-12 d-flex justify-content-between">
+                    <div class="col-9 d-flex flex-column">
+                        <p class="mb-2 text-end text-muted fs-6">{{ object.user }}</p>
+                        <span class="text-end text-muted fs-6">{{ object.time_submit }}</span>
+                    </div>
+                    {% if user.is_staff %}
+                    <div class="col-2">
+                        <form action="{% url 'delete_feedback' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" readonly name="feedback" value="{{ object.id }}">
+                            <button class="btn btn-danger ms-auto" type="submit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3" viewBox="0 0 16 16">
+                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %} 
                 </div>
             </li>
             <hr/>

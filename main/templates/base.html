@@ -18,14 +18,14 @@
                 <div class="d-flex justify-content-center py-3">
                     <ul class="nav nav-pills">
                         <li class="nav-item">
-                            <a href="{% url 'main' %}" class="nav-link active">Мероприятия</a>
+                            <a href="{% url 'main' %}" class="nav-link {{ active.event }}">Мероприятия</a>
                         </li>
                         <li class="nav-item">
-                            <a href="{% url 'posts' %}" class="nav-link">Публикации</a>
+                            <a href="{% url 'posts' %}" class="nav-link {{ active.post }}">Публикации</a>
                         </li>
                         {% if user.is_active %}
                         <li class="nav-item">
-                            <a href="{% url 'profile' %}" class="nav-link">Личный кабинет</a>
+                            <a href="{% url 'profile' %}" class="nav-link {{ active.profile }}">Личный кабинет</a>
                         </li>
                         {% endif %}
                     </ul>

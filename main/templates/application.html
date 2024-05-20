@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    <title>{{ title }}</title>
+{% endblock %}
+
+{% block stylesheet %}{% endblock %}
+
+{% block content %}
+{% if user.is_staff %}
+
+<div class="mb-2 d-flex justify-content-between">
+    {% if apply %}
+    <a href="{% url 'applications' event.id 'visit_log' %}" class="btn btn-warning">Журнал</a>
+    {% elif visit_log %}
+    <a href="{% url 'applications' event.id 'apply' %}" class="btn btn-success">Заявки</a>
+    {% endif %}
+    <div class="fs-5 col-9">{{event.title}}</div>
+</div>
+{% endif %}
+<div class="card">
+    <div class="card-header">
+        Список заявок
+    </div>
+    <div class="card-body">
+        <ul class="list-group">
+            {% for object in object_list %}
+            <li class="row">
+                <div class="col d-flex justify-content-between">
+                    <div>{{ object.user }}</div>
+                    <div class="btn-group">
+                        {% if apply %}
+                        <form action="{% url 'change_status_application' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" readonly name="apply_id" value="{{ object.id }}">
+                            <input type="hidden" readonly name="status_id" value="2">
+                            <input type="submit" class="btn btn-success" value="Принять">
+                        </form>
+                        <form action="{% url 'change_status_application' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" readonly name="apply_id" value="{{ object.id }}">
+                            <input type="hidden" readonly name="status_id" value="3">
+                            <input type="submit" class="btn btn-warning" value="Отклонить">
+                        </form>
+                        {% elif visit_log %}
+                        <form action="{% url 'change_status_application' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" readonly name="apply_id" value="{{ object.id }}">
+                            <input type="hidden" readonly name="status_id" value="5">
+                            {% if object.status_id == 2 %}
+                            <input type="submit" class="btn btn-warning" value="Подтвердить">
+                            {% elif object.status_id == 5 %}
+                            <input type="submit" class="btn btn-primary" value="Участвовал" disabled>
+                            {% endif %}
+                        </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </li>
+            <hr/>
+            {% empty %}
+            <li>Список мероприятий пуст.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
