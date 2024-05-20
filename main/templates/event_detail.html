@@ -23,7 +23,8 @@
             {% csrf_token %}
             {{ object }}
             {% if user_is_staff %}
-            <button type="submit" class="btn btn-primary">Изменить</button>
+            <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'edit_event' object.pk %}">Редактировать событие</a>
+
             {% else %}
             {% if user.is_authenticated %}
             <a class="btn btn-primary ms-auto" aria-current="page"  href="{% url 'subscribe' object.pk %}" class="nav-link">Подать заявку</a>

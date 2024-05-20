@@ -91,14 +91,31 @@ def logout_view(request):
 
 
 def user_profile_event(request):
-    aplication = Application.objects.filter(user_id=request.user.id).select_related('event')
+    aplication = Application.objects.filter(user_id=request.user.id).select_related('event').select_related('status')
     context = {'aplication': aplication}
     return render(request, 'profile_list_event.html', context=context)
 
 
+def admin_profile_event(request):
+    event = Event.objects.all()
+    context = {'event': event}
+    return render(request, 'profile_list_event_admin.html', context=context)
+
+
+    pass
+
+def edit_event_status(request):
+     if request.method == 'POST':
+        event_id = request.POST.get('event_id')
+        status = Status.objects.get(id=4)# Отменена
+        aplication = Application.objects.filter(event=event_id).select_related('status').update(status=status)
+        return redirect(request.META.get('HTTP_REFERER'))
+
+
+
 def subscribe_view(request, pk):
     now = datetime.datetime.now()
-    status = Status.objects.get(id=1)
+    status = Status.objects.get(id=1) 
 
     if request.method == 'GET':
         aplication, created = Application.objects.get_or_create(
@@ -155,15 +172,21 @@ class EventDetailView(DetailView):
         return context
 
 
-def edit_event(request, id=None):
+def edit_event(request, pk):
+    one_rec = Event.objects.get(id=pk)
+    form = CreateEventForm(instance=one_rec)
     if request.method == 'POST':
-        one_rec=Event.objects.get(pk=id)
-        form=CreateEventForm(request.POST or None,request.FILES or None, instance=one_rec)
-        if form.is_valid():
-            form.save()
-            return redirect('/')
-        mydict= {'form':form}
-        return render(request,'Edit.html',context=mydict)
+        form = CreateEventForm(request.POST, instance=one_rec)  # Обновляем форму с данными из POST-запроса
+        if form.is_valid():  # Проверяем валидность формы
+            form.save()  # Сохраняем обновленные данные в базе данных
+        return redirect(request.META.get('HTTP_REFERER'))    
+
+        
+
+ 
+    mydict= {'form':form}
+    return render(request,'edit_event.html',context=mydict)
+
 
 def delete_event(request,id=None):
     if request.method == 'POST':

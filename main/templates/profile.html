@@ -9,9 +9,16 @@
 {% block stylesheet %}{% endblock %}
 
 {% block content %}
+{% if user.is_staff %}
 <div class="user_event">
-    <a href="{% url 'profile_event'%}">Мои мероприятия --➡️</a>
+    <a href="{% url 'profile_event_admin'%}">Редактировать мероприятия--➡️</a>
 </div>
+
+{% else %}
+<div class="user_event">
+    <a href="{% url 'profile_event'%}">Мои мероприятия--➡️</a>
+</div>
+{% endif %}
 <div class="card">
     {% for message in messages %}
     {% if message.tags == 'success' %}

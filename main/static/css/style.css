@@ -27,6 +27,16 @@ label{
     cursor: pointer;
     font-size: 20px;
     margin-bottom: 10px;
-
 }
-
+.heder_event {
+    display: flex;
+    justify-content: space-between;
+}
+.title_event {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+#cancel_button {
+    background-color: brown;
+}

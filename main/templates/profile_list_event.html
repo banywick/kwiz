@@ -21,13 +21,23 @@
             {% for apl in aplication %}
             <li class="row">
                 <div class="col">
-                    <img src="{{apl.event.image}}" alt="">
+                    <img src="/{{apl.event.image}}" alt="">
                 </div>
                 <div class="col-6">
-                    <div>{{ apl.event.name }}</div> 
+                    <div class="heder_event">
+                        <div  class='title_event'>{{ apl.event.title }}</div> 
+                        <div>{{ apl.status.title }}</div> 
+                    </div>
                     <div>{{ apl.event.description }}</div>
                     <div>
                         <a class="btn btn-primary ms-auto" aria-current="page" href="{% url 'detail_event' apl.event.id %}">Подробнее</a>
+                    </div>
+                    <div>
+                        <form action="{% url "edit_event_status" %}" method=post> 
+                            {% csrf_token %}
+                            <input type="submit" id='cancel_button' class="btn btn-primary ms-auto" aria-current="page" value='Отменить'>
+                            <input type="text" hidden name='event_id' value={{ apl.event.id }}>
+                        </form>
                     </div>
                 </div>
             </li>
@@ -39,3 +49,4 @@
     </div>
 </div>
 {% endblock %}
+
